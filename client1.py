@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 import tkinter
@@ -51,7 +49,7 @@ top.protocol("WM_DELETE_WINDOW", on_closing)
 
 #----Now comes the sockets part----
 HOST = 'localhost'
-PORT = 33333
+PORT = 33334
 BUFSIZ = 1024
 ADDR = (HOST, PORT)
 

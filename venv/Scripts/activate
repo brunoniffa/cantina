@@ -37,7 +37,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\Niffa\Google Drive\Documentos\Senac\SistemasDistribuidos\PyCharm\Cantina_oficial\venv"
+VIRTUAL_ENV="C:\Users\Niffa\Google Drive\Documentos\Senac\SistemasDistribuidos\PyCharm\Git\cantina\venv"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"

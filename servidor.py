@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
@@ -44,7 +43,7 @@ clients = {}
 addresses = {}
 
 HOST = 'localhost'
-PORT = 33333
+PORT = 33334
 BUFSIZ = 1024
 ADDR = (HOST, PORT)
 
