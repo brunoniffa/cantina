@@ -14,7 +14,7 @@ class RequestHandler(SimpleXMLRPCRequestHandler):
 users = [
     User(0, 'Rafael Cruz', 'rafael', '123', 100.00),
     User(1, 'Bruno', 'bruno', '456', 50.00),
-    User(2, 'Atendente 01', 'atendente', '000', 0)
+    User(2, 'Atendente 01', 'atendente', '111', 0)
 ]
 
 menu = [
@@ -22,9 +22,7 @@ menu = [
     Product(1, 'Vinho', 20)
 ]
 
-requests = [
-    Request(0, users[0], menu[0])
-]
+requests = []
 
 
 # Create server
@@ -32,17 +30,16 @@ with SimpleXMLRPCServer(('localhost', 8000), requestHandler=RequestHandler) as s
     server.register_introspection_functions()
 
     def login(username, password):
-
         for user in users:
             if username == user.username and password == user.password:
-                if username == 'atendente':
+                if str(username) == str('atendente'):
                     return {'requests': requests, 'user': user}
                 else:
                     return {'menu': menu, 'user': user}
 
         return {'erro': ''}
 
-    def request(userIndex, productIndex):
+    def send_request(userIndex, productIndex):
         try:
 
             if users[userIndex].balance >= menu[productIndex].value:
@@ -58,10 +55,33 @@ with SimpleXMLRPCServer(('localhost', 8000), requestHandler=RequestHandler) as s
             return {'erro': ''}
 
         except:
-            print("Erro ao comparar")
+            print("Erro ao inserir um pedido")
 
-    server.register_function(request)
+    def get_requests():
+        try:
+
+            return {'requests': requests}
+
+        except:
+            print("Erro ao devolver os pedidos")
+
+    def finish_request(requestIndex):
+        try:
+
+            if requests[requestIndex] in requests:
+                requests.pop(requestIndex)
+                print("Sucesso ao dar baixa no pedido")
+                return {'requests': requests}
+
+            return {'erro': ''}
+
+        except:
+            print("Erro ao dar baixa no pedido")
+
     server.register_function(login)
+    server.register_function(send_request)
+    server.register_function(get_requests)
+    server.register_function(finish_request)
 
     print('Start server on port:8000')
     server.serve_forever()

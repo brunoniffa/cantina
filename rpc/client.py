@@ -26,24 +26,25 @@ class Application(tk.Frame):
                 self.entry_username.get(), self.entry_password.get())
 
             self.user = result['user']
-            self.menu = result['menu']
 
             if 'menu' in result:
+                self.menu = result['menu']
                 self.show_menu_screen(result['menu'])
             elif 'requests' in result:
+                self.requests = result['requests']
                 self.show_requests_screen(result['requests'])
 
         except:
             print("Erro ao efetuar o login")
 
-    def request(self):
+    def send_request(self):
         try:
 
             user = self.user
             product = self.menu[self.list_menu.curselection()[0]]
 
-            # Envia o pedido
-            result = self.server.request(user['id'], product['id'])
+            # Send the request
+            result = self.server.send_request(user['id'], product['id'])
 
             if 'user' in result:
 
@@ -61,6 +62,61 @@ class Application(tk.Frame):
 
         except:
             print("Erro ao efetuar o pedido")
+
+    def get_requests(self):
+        try:
+
+            self.list_requests.delete(0, tk.END)
+
+            # Get the Requests
+            result = self.server.get_requests()
+
+            if result['requests']:
+                # Update list
+                self.requests = result['requests']
+                self.update_request_list(result['requests'])
+
+                print("Pedidos carregados com sucesso")
+
+            else:
+                print("Não existe pedidos")
+
+        except:
+            print("Erro ao buscar os pedido")
+
+    def finish_request(self):
+        try:
+
+            if self.list_requests.curselection():
+
+                # Finish the request
+                result = self.server.finish_request(
+                    self.list_requests.curselection()[0])
+
+                # Update list
+                self.get_requests()
+
+                print("Pedido finalizado com sucesso")
+
+            else:
+                print("Selecione um pedido")
+
+        except:
+            print("Erro ao finalizar o pedido")
+
+    def update_request_list(self, requestList):
+        try:
+
+            # Update List
+            for i in range(len(requestList)):
+                if requestList[i] != None:
+                    self.list_requests.insert(i, str(requestList[i]['user']['name']) + " pediu 1 " + str(
+                        requestList[i]['product']['name']) + ' custando R$ ' + str(requestList[i]['product']['value']))
+
+            print("Lista de pedidos atualizada com sucesso")
+
+        except:
+            print("Erro ao atualizar a lista de pedidos")
 
     def show_login_screen(self):
 
@@ -90,7 +146,7 @@ class Application(tk.Frame):
 
             # Screen
             self.screen_menu = tk.Toplevel(self)
-            self.screen_menu.title("Cardápio")
+            self.screen_menu.title(str(self.user['name']) + " \ Cardápio")
             self.screen_menu.geometry("300x300")
 
             # List
@@ -103,18 +159,19 @@ class Application(tk.Frame):
                     i, v)
 
             self.list_menu.grid(row=1, column=1)
+            self.list_menu.config(width="50")
 
             # Button
-            self.button_request = tk.Button(self.screen_menu)
-            self.button_request['text'] = 'Fazer pedido'
-            self.button_request['command'] = self.request
-            self.button_request.grid(row=2, column=1)
+            self.button_send_request = tk.Button(self.screen_menu)
+            self.button_send_request['text'] = 'Fazer pedido'
+            self.button_send_request['command'] = self.send_request
+            self.button_send_request.grid(row=2, column=1)
 
             # Balance
-            balance = "Saldo: " + str(self.user['balance'])
+            balance = "Saldo: R$ " + str(self.user['balance'])
             self.label_balance = tk.Label(
                 self.screen_menu, text=str(balance))
-            self.label_balance.grid(row=2, column=2)
+            self.label_balance.grid(row=3, column=1)
 
         except:
             print("Erro ao carregar os produtos")
@@ -122,17 +179,29 @@ class Application(tk.Frame):
     def show_requests_screen(self, requestList):
         try:
 
+            # Screen
             self.screen_requests = tk.Toplevel(self)
-            self.screen_requests.title("Pedidos")
+            self.screen_requests.title(str(self.user['name']) + " \ Pedidos")
             self.screen_requests.geometry("300x300")
             self.list_requests = tk.Listbox(self.screen_requests)
 
-            for i in range(len(requestList)):
-                self.list_requests.insert(i, requestList[i]['user']['name'] + " pediu 1 " +
-                                          requestList[i]['product']['name'] + ' | ' + requestList[i]['product']['value'])
+            # List
+            self.update_request_list(requestList)
 
             self.list_requests.grid(row=1, column=1)
-            self.list_requests.config(width="300")
+            self.list_requests.config(width="50")
+
+            # Button
+            self.button_get_requests = tk.Button(self.screen_requests)
+            self.button_get_requests['text'] = 'Carregar pedidos'
+            self.button_get_requests['command'] = self.get_requests
+            self.button_get_requests.grid(row=2, column=1)
+
+            # Button
+            self.button_finish_request = tk.Button(self.screen_requests)
+            self.button_finish_request['text'] = 'Finalizar pedido'
+            self.button_finish_request['command'] = self.finish_request
+            self.button_finish_request.grid(row=3, column=1)
 
         except:
             print("Erro ao carregar os pedidos")
